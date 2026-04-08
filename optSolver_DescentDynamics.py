@@ -21,18 +21,18 @@ _DEFAULTS = {
     'max_iterations': 1000,  # max outer iterations
     # Backtracking (Armijo) parameters
     'alpha_bar': 1.0,        # initial step size
-    'c1_ls': 1e-4,           # sufficient decrease constant
-    'tau': 0.5,              # step reduction factor
+    'c1_ls': 0.01,           # sufficient decrease constant
+    'tau': 0.7,              # step reduction factor
     # Wolfe curvature constant
-    'c2_ls': 0.9,
+    'c2_ls': 0.44,
     # Trust region parameters
     'delta0': 1.0,           # initial TR radius
-    'delta_max': 100.0,      # maximum TR radius
-    'c1_tr': 0.1,            # accept step if rho >= c1_tr
-    'c2_tr': 0.75,           # expand TR if rho >= c2_tr
+    'delta_max': 500.0,      # maximum TR radius
+    'c1_tr': 0.25,            # accept step if rho >= c1_tr
+    'c2_tr': 0.9,           # expand TR if rho >= c2_tr
     # CG subproblem (Steihaug)
-    'term_tol_CG': 1e-6,
-    'max_iterations_CG': 200,
+    'term_tol_CG': 0.0001,
+    'max_iterations_CG': 100,
 }
 
 

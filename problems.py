@@ -2,12 +2,15 @@
 problems.py - Test problem definitions for IOE 511/MATH 562 project.
 Provides all 12 required problems (P1-P12) via get_problem(name).
 
-NOTE: Quadratic matrices (P1-P4) are generated via numpy rng (not MATLAB's rng),
-so results may differ from MATLAB-generated baselines. Replace Q/q with actual
-course-provided matrices if available.
+P1-P4 quadratic matrices Q are loaded from course-provided .mat files.
+q vectors are generated with np.random.seed(0), matching Project_Problems.py.
 """
 
 import numpy as np
+import scipy.io
+import os
+
+_MAT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class Problem:
@@ -43,52 +46,44 @@ class Problem:
         self.H_evals = 0
 
 
-# ===== Helpers =====
-
-def _make_spd(n, kappa, seed):
-    """Generate an n x n SPD matrix with condition number kappa using numpy rng."""
-    rng = np.random.default_rng(seed)
-    Z = rng.standard_normal((n, n))
-    U, _ = np.linalg.qr(Z)                          # random orthogonal basis
-    eigs = np.exp(np.linspace(0, np.log(kappa), n)) # log-spaced eigenvalues in [1, kappa]
-    return U @ np.diag(eigs) @ U.T
-
-
 # ===== P1-P4: Convex Quadratics =====
 # f(x) = 0.5 x^T Q x + q^T x
+# Q loaded from course-provided .mat files; q ~ N(0,1) with seed 0.
 
-def _make_quadratic(n, kappa, Q_seed, q_seed, x0_seed=0):
-    Q = _make_spd(n, kappa, Q_seed)
-    q = np.random.default_rng(q_seed).standard_normal(n)
-    x0 = 20 * np.random.default_rng(x0_seed).random(n) - 10
-
-    f = lambda x: 0.5 * x @ Q @ x + q @ x
+def _load_quad_mat(mat_name, n):
+    """Load Q from a .mat file and generate q with the course-standard seed."""
+    mat = scipy.io.loadmat(os.path.join(_MAT_DIR, mat_name))
+    Q = mat['Q']
+    np.random.seed(0)
+    q = np.random.normal(size=n)
+    x0 = np.zeros(n)
+    f = lambda x: float(0.5 * x @ Q @ x + q @ x)
     g = lambda x: Q @ x + q
-    H = lambda x: Q
-    return Q, q, x0, f, g, H
+    H = lambda x: Q.copy()
+    return f, g, H, x0
 
 
 def p1_quad_10_10():
     """Quadratic, n=10, kappa=10."""
-    Q, q, x0, f, g, H = _make_quadratic(10, 10, Q_seed=1, q_seed=2)
+    f, g, H, x0 = _load_quad_mat('quad_10_10_Q.mat', 10)
     return Problem('P1_quad_10_10', x0, f, g, H)
 
 
 def p2_quad_10_1000():
     """Quadratic, n=10, kappa=1000."""
-    Q, q, x0, f, g, H = _make_quadratic(10, 1000, Q_seed=3, q_seed=4)
+    f, g, H, x0 = _load_quad_mat('quad_10_1000_Q.mat', 10)
     return Problem('P2_quad_10_1000', x0, f, g, H)
 
 
 def p3_quad_1000_10():
     """Quadratic, n=1000, kappa=10."""
-    Q, q, x0, f, g, H = _make_quadratic(1000, 10, Q_seed=5, q_seed=6)
+    f, g, H, x0 = _load_quad_mat('quad_1000_10_Q.mat', 1000)
     return Problem('P3_quad_1000_10', x0, f, g, H)
 
 
 def p4_quad_1000_1000():
     """Quadratic, n=1000, kappa=1000."""
-    Q, q, x0, f, g, H = _make_quadratic(1000, 1000, Q_seed=7, q_seed=8)
+    f, g, H, x0 = _load_quad_mat('quad_1000_1000_Q.mat', 1000)
     return Problem('P4_quad_1000_1000', x0, f, g, H)
 
 

@@ -11,7 +11,32 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import warnings
+import threading
 warnings.filterwarnings('ignore')
+
+# Maximum wall-clock seconds per (problem, method) run before giving up
+RUN_TIMEOUT = 60  # seconds
+
+
+def _run_with_timeout(fn, timeout):
+    """Run fn() in a thread; return its result or raise TimeoutError after timeout seconds."""
+    result = [None]
+    exc = [None]
+
+    def target():
+        try:
+            result[0] = fn()
+        except Exception as e:
+            exc[0] = e
+
+    t = threading.Thread(target=target, daemon=True)
+    t.start()
+    t.join(timeout)
+    if t.is_alive():
+        raise TimeoutError(f"exceeded {timeout}s")
+    if exc[0] is not None:
+        raise exc[0]
+    return result[0]
 
 from problems import all_problems
 from optSolver_DescentDynamics import optSolver_DescentDynamics
@@ -64,7 +89,10 @@ def run_all(verbose=True):
                 continue
 
             try:
-                x, f, info = optSolver_DescentDynamics(prob, method, OPTIONS)
+                x, f, info = _run_with_timeout(
+                    lambda m=method: optSolver_DescentDynamics(prob, m, OPTIONS),
+                    RUN_TIMEOUT
+                )
                 converged = info['term_flag'] == 0
                 results[(prob.name, method)] = {
                     'skipped': False,
