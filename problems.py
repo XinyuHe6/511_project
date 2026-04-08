@@ -52,8 +52,12 @@ class Problem:
 
 def _load_quad_mat(mat_name, n):
     """Load Q from a .mat file and generate q with the course-standard seed."""
+    import scipy.sparse
     mat = scipy.io.loadmat(os.path.join(_MAT_DIR, mat_name))
     Q = mat['Q']
+    if scipy.sparse.issparse(Q):
+        Q = Q.toarray()   # .mat files store Q as sparse; convert to dense ndarray
+    Q = np.array(Q, dtype=float)
     np.random.seed(0)
     q = np.random.normal(size=n)
     x0 = np.zeros(n)

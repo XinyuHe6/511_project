@@ -55,6 +55,8 @@ METHODS = [
 # All problems have Hessians implemented, but n=1000 ones may be slow for Newton
 SKIP_HESSIAN_METHODS = {'Newton', 'NewtonW', 'TRNewtonCG'}
 LARGE_PROBLEMS = {'P3_quad_1000_10', 'P4_quad_1000_1000', 'P8_rosenbrock_100', 'P11_exponential_1000'}
+# P4 also skips dense quasi-Newton (BFGS/DFP) due to O(n^2) cost at n=1000
+SKIP_DENSE_QN_PROBLEMS = {'P4_quad_1000_1000'}
 
 OPTIONS = {
     'term_tol': 1e-6,
@@ -64,10 +66,10 @@ OPTIONS = {
     'tau': 0.5,
     'c2_ls': 0.9,
     'delta0': 1.0,
-    'delta_max': 100.0,
-    'c1_tr': 0.1,
-    'c2_tr': 0.75,
-    'term_tol_CG': 1e-6,
+    'delta_max': 500.0,     # increased from 100 → 500 (TR methods benefit on P1-P4)
+    'c1_tr': 0.25,          # increased from 0.1 → 0.25 (standard acceptance threshold)
+    'c2_tr': 0.9,           # increased from 0.75 → 0.9 (more aggressive TR expansion)
+    'term_tol_CG': 1e-4,    # relaxed from 1e-6 → 1e-4 (inexact CG is more efficient)
     'max_iterations_CG': 200,
 }
 
@@ -86,6 +88,13 @@ def run_all(verbose=True):
                 results[(prob.name, method)] = {'skipped': True, 'reason': 'n too large for H'}
                 if verbose:
                     print(f"  SKIP  {prob.name:25s}  {method:20s}  (large n, Hessian too expensive)")
+                continue
+            # Skip dense quasi-Newton for P4 (n=1000, O(n^2) matrix ops too slow)
+            DENSE_QN = {'BFGS', 'BFGSW', 'DFP', 'DFPW'}
+            if prob.name in SKIP_DENSE_QN_PROBLEMS and method in DENSE_QN:
+                results[(prob.name, method)] = {'skipped': True, 'reason': 'n=1000 dense QN too slow'}
+                if verbose:
+                    print(f"  SKIP  {prob.name:25s}  {method:20s}  (n=1000, dense quasi-Newton too slow)")
                 continue
 
             try:
@@ -156,15 +165,26 @@ def print_summary_table(results, problems):
 # ===== CONVERGENCE PLOTS (f vs. iteration) =====
 
 def plot_convergence(results, problems, save_dir=None):
-    """Plot f(x_k) vs iteration for each problem (all methods on one axes)."""
+    """Plot f(x_k) - f* vs iteration (log scale) for each problem."""
     for prob in problems:
+        # Collect all f values across methods to find f* (best known minimum)
+        all_f = []
+        for method in METHODS:
+            r = results.get((prob.name, method), {})
+            if not r.get('skipped') and r.get('f_hist'):
+                all_f.extend(r['f_hist'])
+        if not all_f:
+            continue
+        f_star = min(all_f)   # best observed value; used to shift so log scale works
+
         fig, ax = plt.subplots(figsize=(8, 5))
         any_plotted = False
         for method in METHODS:
             r = results.get((prob.name, method), {})
             if r.get('skipped') or not r.get('f_hist'):
                 continue
-            ax.semilogy(r['f_hist'], label=method, alpha=0.8)
+            shifted = np.array(r['f_hist']) - f_star + 1e-14   # shift to positive
+            ax.semilogy(shifted, label=method, alpha=0.8)
             any_plotted = True
 
         if not any_plotted:
@@ -172,7 +192,7 @@ def plot_convergence(results, problems, save_dir=None):
             continue
 
         ax.set_xlabel('Iteration')
-        ax.set_ylabel('f(x_k)')
+        ax.set_ylabel('f(x_k) − f*  (log scale)')
         ax.set_title(f'Convergence — {prob.name}')
         ax.legend(fontsize=7, ncol=2)
         ax.grid(True, alpha=0.3)
