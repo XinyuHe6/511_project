@@ -21,6 +21,8 @@ _DEFAULTS = {
     'max_iterations': 1000,  # max outer iterations
     # Backtracking (Armijo) parameters
     'alpha_bar': 1.0,        # initial step size
+    'alpha_max': 100.0,      # maximum step size considered by line search
+    'max_ls_iterations': 100,  # maximum line-search iterations
     'c1_ls': 0.01,           # sufficient decrease constant
     'tau': 0.7,              # step reduction factor
     # Wolfe curvature constant
@@ -117,9 +119,11 @@ def optSolver_DescentDynamics(problem, method, options=None):
 
 def _backtracking(problem, x, f, g, d, opts):
     """Armijo (sufficient decrease) backtracking line search."""
-    alpha = opts.alpha_bar
+    alpha = min(opts.alpha_bar, opts.alpha_max)
     gtd = g @ d   # directional derivative (must be < 0 for a descent direction)
-    while problem.compute_f(x + alpha * d) > f + opts.c1_ls * alpha * gtd:
+    for _ in range(opts.max_ls_iterations):
+        if problem.compute_f(x + alpha * d) <= f + opts.c1_ls * alpha * gtd:
+            break
         alpha *= opts.tau
         if alpha < 1e-16:
             break
@@ -138,30 +142,30 @@ def _wolfe_ls(problem, x, f, g, d, opts):
     def phi(a):  return problem.compute_f(x + a * d)
     def dphi(a): return problem.compute_g(x + a * d) @ d
 
-    alpha, alpha_prev = 1.0, 0.0
+    alpha, alpha_prev = min(opts.alpha_bar, opts.alpha_max), 0.0
     phi_prev = phi0
 
-    for i in range(50):
+    for i in range(opts.max_ls_iterations):
         phi_a = phi(alpha)
         # Armijo violated or function increased: bracket found, zoom in
         if phi_a > phi0 + c1*alpha*dphi0 or (i > 0 and phi_a >= phi_prev):
-            return _zoom(phi, dphi, alpha_prev, alpha, phi0, dphi0, c1, c2)
+            return _zoom(phi, dphi, alpha_prev, alpha, phi0, dphi0, c1, c2, opts.max_ls_iterations)
         dphi_a = dphi(alpha)
         if abs(dphi_a) <= -c2*dphi0:
             return alpha        # strong Wolfe satisfied
         if dphi_a >= 0:
-            return _zoom(phi, dphi, alpha, alpha_prev, phi0, dphi0, c1, c2)
+            return _zoom(phi, dphi, alpha, alpha_prev, phi0, dphi0, c1, c2, opts.max_ls_iterations)
         alpha_prev = alpha
         phi_prev = phi_a
-        alpha = min(2.0*alpha, opts.alpha_bar * 10)
+        alpha = min(2.0 * alpha, opts.alpha_max)
 
     return alpha
 
 
-def _zoom(phi, dphi, a_lo, a_hi, phi0, dphi0, c1, c2):
+def _zoom(phi, dphi, a_lo, a_hi, phi0, dphi0, c1, c2, max_ls_iterations):
     """Zoom phase: narrow [a_lo, a_hi] to a point satisfying strong Wolfe conditions."""
     phi_lo = phi(a_lo)
-    for _ in range(50):
+    for _ in range(max_ls_iterations):
         alpha = 0.5*(a_lo + a_hi)   # bisection; cubic interpolation also works
         phi_a = phi(alpha)
         if phi_a > phi0 + c1*alpha*dphi0 or phi_a >= phi_lo:

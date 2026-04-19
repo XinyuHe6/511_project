@@ -3,3 +3,9 @@
 __pycache__/
 *.pyc
 opt/
+.venv/
+.codex/
+results/
+__pycache__/
+*.pyc
+.codex

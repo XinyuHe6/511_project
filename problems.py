@@ -1,6 +1,6 @@
 """
 problems.py - Test problem definitions for IOE 511/MATH 562 project.
-Provides all 12 required problems (P1-P12) via get_problem(name).
+Provides all test problems (P1-P14) via get_problem(name).
 
 P1-P4 quadratic matrices Q are loaded from course-provided .mat files.
 q vectors are generated with np.random.seed(0), matching Project_Problems.py.
@@ -130,25 +130,43 @@ def p6_quartic_2():
     return Problem('P6_quartic_2', _X0_QUARTIC.copy(), f, g, H)
 
 
-# ===== P7: Rosenbrock 2D =====
+# ===== P7 / P13-P14: Rosenbrock 2D =====
 
-def p7_rosenbrock_2():
-    """Rosenbrock, n=2."""
+def _make_rosenbrock_2d(beta):
+    """Build a 2D Rosenbrock variant with coefficient beta."""
     def f(x):
-        return (1 - x[0])**2 + 100 * (x[1] - x[0]**2)**2
+        return (1 - x[0])**2 + beta * (x[1] - x[0]**2)**2
 
     def g(x):
         return np.array([
-            -2*(1 - x[0]) - 400*x[0]*(x[1] - x[0]**2),
-            200*(x[1] - x[0]**2)
+            -2*(1 - x[0]) - 4*beta*x[0]*(x[1] - x[0]**2),
+            2*beta*(x[1] - x[0]**2)
         ])
 
     def H(x):
-        h11 = 2 - 400*(x[1] - x[0]**2) + 800*x[0]**2
-        h12 = -400*x[0]
-        return np.array([[h11, h12], [h12, 200.0]])
+        h11 = 2 - 4*beta*(x[1] - x[0]**2) + 8*beta*x[0]**2
+        h12 = -4*beta*x[0]
+        return np.array([[h11, h12], [h12, 2.0*beta]])
 
+    return f, g, H
+
+
+def p7_rosenbrock_2():
+    """Rosenbrock, n=2, beta=100."""
+    f, g, H = _make_rosenbrock_2d(100)
     return Problem('P7_rosenbrock_2', np.array([-1.2, 1.0]), f, g, H)
+
+
+def p13_rosenbrock_2_100():
+    """Rosenbrock variant, n=2, beta=100."""
+    f, g, H = _make_rosenbrock_2d(100)
+    return Problem('P13_rosenbrock_2_100', np.array([0.0, 1.0]), f, g, H)
+
+
+def p14_rosenbrock_2_1000():
+    """Rosenbrock variant, n=2, beta=1000."""
+    f, g, H = _make_rosenbrock_2d(1000)
+    return Problem('P14_rosenbrock_2_1000', np.array([0.0, 1.0]), f, g, H)
 
 
 # ===== P8: Rosenbrock 100D =====
@@ -315,6 +333,8 @@ _PROBLEM_MAP = {
     'P10_exponential_10':   p10_exponential_10,
     'P11_exponential_1000': p11_exponential_1000,
     'P12_genhumps_5':   p12_genhumps_5,
+    'P13_rosenbrock_2_100': p13_rosenbrock_2_100,
+    'P14_rosenbrock_2_1000': p14_rosenbrock_2_1000,
 }
 
 
@@ -326,5 +346,5 @@ def get_problem(name):
 
 
 def all_problems():
-    """Return a list of all 12 Problem instances."""
+    """Return a list of all Problem instances."""
     return [fn() for fn in _PROBLEM_MAP.values()]
