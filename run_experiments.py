@@ -62,15 +62,15 @@ OPTIONS = {
     'term_tol': 1e-6,
     'max_iterations': 1000,
     'alpha_bar': 1.0,
-    'c1_ls': 1e-4,
+    'c1_ls': 1e-3,
     'tau': 0.5,
     'c2_ls': 0.9,
     'delta0': 1.0,
     'delta_max': 500.0,     # increased from 100 → 500 (TR methods benefit on P1-P4)
-    'c1_tr': 0.25,          # increased from 0.1 → 0.25 (standard acceptance threshold)
-    'c2_tr': 0.9,           # increased from 0.75 → 0.9 (more aggressive TR expansion)
-    'term_tol_CG': 1e-4,    # relaxed from 1e-6 → 1e-4 (inexact CG is more efficient)
-    'max_iterations_CG': 200,
+    'c1_tr': 0.03,
+    'c2_tr': 0.7,
+    'term_tol_CG': 0.1,
+    'max_iterations_CG': 100,
 }
 
 
