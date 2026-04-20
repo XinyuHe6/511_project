@@ -1,0 +1,3 @@
+method,total_pairs,attempted_runs,skipped_runs,successful_runs,success_rate,avg_iterations,avg_total_evaluations,avg_f_evals,avg_g_evals,avg_H_evals
+TRNewtonCG,14,10,4,9,0.9,19.22222222222222,54.22222222222222,19.22222222222222,16.77777777777778,18.22222222222222
+TRSR1CG,14,14,0,13,0.9285714285714286,45.0,80.6923076923077,45.0,35.69230769230769,0.0

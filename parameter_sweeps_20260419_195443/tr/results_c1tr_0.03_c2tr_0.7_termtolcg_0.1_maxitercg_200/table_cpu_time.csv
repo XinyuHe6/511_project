@@ -1,0 +1,15 @@
+Problem,TRNewtonCG,TRSR1CG
+P1_quad_10_10,0.001,0.004
+P2_quad_10_1000,0.003,0.002
+P3_quad_1000_10,SKIP,0.102
+P4_quad_1000_1000,SKIP,FAIL
+P5_quartic_1,0.000,0.000
+P6_quartic_2,0.001,0.003
+P7_rosenbrock_2,0.001,0.003
+P8_rosenbrock_100,SKIP,0.006
+P9_datafit_2,0.001,0.001
+P10_exponential_10,0.001,0.002
+P11_exponential_1000,SKIP,0.003
+P12_genhumps_5,0.003,0.005
+P13_rosenbrock_2_100,0.001,0.003
+P14_rosenbrock_2_1000,0.002,0.004

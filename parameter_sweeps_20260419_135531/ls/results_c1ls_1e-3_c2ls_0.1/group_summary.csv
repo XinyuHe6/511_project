@@ -1,0 +1,2 @@
+total_pairs,attempted_runs,skipped_runs,successful_runs,success_rate,avg_iterations,avg_total_evaluations,avg_f_evals,avg_g_evals,avg_H_evals
+112,99,13,82,0.8282828282828283,52.0609756097561,522.2560975609756,404.4024390243902,114.82926829268293,3.024390243902439

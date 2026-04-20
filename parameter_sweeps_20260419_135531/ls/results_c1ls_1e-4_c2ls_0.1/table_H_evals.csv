@@ -1,0 +1,15 @@
+Problem,GradientDescent,GradientDescentW,Newton,NewtonW,BFGS,BFGSW,DFP,DFPW
+P1_quad_10_10,0,0,1,1,0,0,0,0
+P2_quad_10_1000,FAIL,FAIL,1,1,0,0,FAIL,0
+P3_quad_1000_10,0,FAIL,SKIP,SKIP,0,0,0,0
+P4_quad_1000_1000,FAIL,FAIL,SKIP,SKIP,SKIP,SKIP,SKIP,SKIP
+P5_quartic_1,0,0,2,2,0,0,0,0
+P6_quartic_2,0,0,19,9,0,0,FAIL,0
+P7_rosenbrock_2,FAIL,FAIL,21,14,0,0,0,0
+P8_rosenbrock_100,0,0,SKIP,SKIP,0,FAIL,0,FAIL
+P9_datafit_2,0,0,6,5,0,0,0,0
+P10_exponential_10,0,0,15,8,0,0,0,0
+P11_exponential_1000,0,0,SKIP,SKIP,0,0,0,0
+P12_genhumps_5,0,0,100,20,0,0,FAIL,0
+P13_rosenbrock_2_100,FAIL,FAIL,7,3,0,0,FAIL,0
+P14_rosenbrock_2_1000,FAIL,FAIL,11,2,0,0,FAIL,0
