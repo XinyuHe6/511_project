@@ -66,10 +66,10 @@ OPTIONS = {
     'tau': 0.5,
     'c2_ls': 0.9,
     'delta0': 1.0,
-    'delta_max': 500.0,     # increased from 100 → 500 (TR methods benefit on P1-P4)
+    'delta_max': 1000.0,
     'c1_tr': 0.03,
     'c2_tr': 0.7,
-    'term_tol_CG': 0.1,
+    'term_tol_CG': 0.01,
     'max_iterations_CG': 100,
 }
 
