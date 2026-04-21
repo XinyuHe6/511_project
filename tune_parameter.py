@@ -1,3 +1,10 @@
+"""
+tune_parameter.py - Lightweight random search over solver hyperparameters.
+
+The active routine below samples parameter configurations, evaluates them on the
+full benchmark set, and ranks them by success rate and average iterations.
+"""
+
 # import numpy as np
 # import pandas as pd
 # import random
@@ -99,20 +106,21 @@ from types import SimpleNamespace
 warnings.filterwarnings('ignore')
 
 def super_tune():
+    """Sample solver settings and report the best-performing configurations."""
     # --- 1. Define the full parameter search space ---
     param_space = {
-        'term_tol': [1e-6],               # 停止准则通常固定
-        'max_iterations': [1000],         # 迭代上限通常固定
-        'alpha_bar': [1.0, 0.5],          # 初始步长（0.5有时能防止溢出）
-        'c1_ls': [1e-4, 1e-3, 1e-2],      # Armijo 常数
-        'tau': [0.5, 0.7, 0.8, 0.9],      # 回退因子
-        'c2_ls': [0.1, 0.44, 0.9],        # Wolfe 曲率常数
-        'delta0': [0.1, 1.0, 5.0],        # 初始信任域半径
-        'delta_max': [100.0, 500.0],      # 最大信任域半径
-        'c1_tr': [0.1, 0.2, 0.25],        # TR 接受阈值
-        'c2_tr': [0.75, 0.8, 0.9],        # TR 扩张阈值
-        'term_tol_CG': [1e-4, 1e-6, 1e-8],# CG 精度
-        'max_iterations_CG': [100, 200, 500] # CG 最大迭代
+        'term_tol': [1e-6],               # The outer stopping tolerance is usually fixed.
+        'max_iterations': [1000],         # The outer iteration cap is usually fixed.
+        'alpha_bar': [1.0, 0.5],          # Smaller initial steps can reduce overflow risk.
+        'c1_ls': [1e-4, 1e-3, 1e-2],      # Armijo sufficient-decrease constant.
+        'tau': [0.5, 0.7, 0.8, 0.9],      # Backtracking shrink factor.
+        'c2_ls': [0.1, 0.44, 0.9],        # Wolfe curvature constant.
+        'delta0': [0.1, 1.0, 5.0],        # Initial trust-region radius.
+        'delta_max': [100.0, 500.0],      # Maximum trust-region radius.
+        'c1_tr': [0.1, 0.2, 0.25],        # Trust-region acceptance threshold.
+        'c2_tr': [0.75, 0.8, 0.9],        # Trust-region expansion threshold.
+        'term_tol_CG': [1e-4, 1e-6, 1e-8],# Inner CG tolerance.
+        'max_iterations_CG': [100, 200, 500] # Inner CG iteration cap.
     }
 
     # --- 2. Prepare the test environment ---
@@ -125,7 +133,7 @@ def super_tune():
         'DFP', 'DFPW'
     ]
     
-    num_random_samples = 10  # 建议先跑10组看效果，每组都会跑120次实验
+    num_random_samples = 10  # A small sample count is a reasonable first pass.
     final_results = []
 
     print(f"Starting Super Tuning: {num_random_samples} random configurations")
@@ -140,14 +148,14 @@ def super_tune():
         solve_count = 0
         total_iters = 0
         
-        # 遍历所有方法和问题
+        # Evaluate the sampled configuration on every method/problem pair.
         for method in all_methods:
             for p_name in all_problem_names:
                 opts = SimpleNamespace(**cfg)
                 
                 try:
                     prob = _PROBLEM_MAP[p_name]()
-                    # Set a short timeout or limit to prevent infinite loops
+                    # Successful solves contribute to the final ranking statistics.
                     _, _, info = optSolver_DescentDynamics(prob, method, opts)
                     
                     if info['term_flag'] == 0:

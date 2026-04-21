@@ -5,6 +5,7 @@ Runs all 10 algorithms on all 12 test problems and prints/saves results.
 
 import sys
 import os
+# Allow this script to be run directly from the project root.
 sys.path.insert(0, os.path.dirname(__file__))
 
 import numpy as np
@@ -72,6 +73,7 @@ OPTIONS = {
     'term_tol_CG': 0.01,
     'max_iterations_CG': 100,
 }
+# Baseline options used for the benchmark unless the file is edited.
 
 
 # ===== RUN EXPERIMENTS =====
@@ -79,6 +81,7 @@ OPTIONS = {
 def run_all(verbose=True):
     """Run all 12 x 10 experiments; return a dict of results."""
     problems = all_problems()
+    # Store all per-problem, per-method diagnostics in one lookup table.
     results = {}  # key: (problem.name, method) -> dict
 
     for prob in problems:

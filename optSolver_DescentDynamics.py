@@ -89,6 +89,7 @@ def optSolver_DescentDynamics(problem, method, options=None):
         raise ValueError("method must have a .name attribute")
 
     opts = _parse_opts(options)
+    # Reset counters so every solve reports clean per-run diagnostics.
     problem.reset_counters()
 
     dispatch = {
@@ -108,6 +109,7 @@ def optSolver_DescentDynamics(problem, method, options=None):
 
     t0 = time.time()
     x, f, info = dispatch[method.name](problem, opts)
+    # Gather bookkeeping here so the method-specific routines can stay focused on the algorithm.
     info['cpu_time'] = time.time() - t0
     info['f_evals'] = problem.f_evals
     info['g_evals'] = problem.g_evals
@@ -292,6 +294,7 @@ def _tr_update(problem, x, f, g, p, B, delta, opts):
 # ===== ALGORITHM IMPLEMENTATIONS =====
 
 def _init_stats():
+    """Create the common diagnostics dictionary shared by all solver variants."""
     return {'iterations': 0, 'term_flag': 1, 'f_hist': [], 'g_norm_hist': []}
 
 

@@ -1,16 +1,20 @@
+"""
+Legacy problem definitions from the course materials.
+
+These functions are kept in the repository as a reference implementation of a
+subset of the benchmark problems. The actively used problem interface lives in
+`problems.py`.
+"""
+
 # IOE 511/MATH 562, University of Michigan
-# Code written by: Albert S. Berahas & Jiahao Shi
+# Code written by Albert S. Berahas and Jiahao Shi.
 
 import numpy as np
 import scipy.stats as stats
 import scipy.sparse as sparse
 import scipy.io
-# Define all the functions and calculate their gradients and Hessians, those functions include:
-# (1)(2)(3)(4) Quadractic function
-# (5)(6) Quartic function
-# (7)(8) Rosenbrock function 
-# (9) Data fit
-# (10)(11) Exponential
+
+# This file includes legacy definitions for quadratic, quartic, and Genhumps problems.
 
  
 # Problem Number: 1
@@ -23,21 +27,19 @@ import scipy.io
 # function that computes the function value of the quad_10_10 function
 
 def quad_10_10_func(x):
-    # set raondom seed
+    """Return the objective value for the 10-dimensional quadratic with kappa = 10."""
+    # Match the course data-generation convention for the linear term q.
     np.random.seed(0)
-    # Generate random data
     q = np.random.normal(size=(10,1))
 
     mat = scipy.io.loadmat('quad_10_10_Q.mat')
     Q = mat['Q']
     
-    # compute function value
     return (1/2*x.T@Q@x + q.T@x)[0]
 
 def quad_10_10_grad(x):
-    # set raondom seed
+    """Return the gradient of the 10-dimensional quadratic with kappa = 10."""
     np.random.seed(12)
-    # Generate random data
     q = np.random.normal(size=(10,1))
     mat = scipy.io.loadmat('quad_10_10_Q.mat')
     Q = mat['Q']
@@ -46,9 +48,8 @@ def quad_10_10_grad(x):
     
 
 def quad_10_10_Hess(x):
-    # set raondom seed
+    """Return the Hessian of the 10-dimensional quadratic with kappa = 10."""
     np.random.seed(12)
-    # Generate random data
     q = np.random.normal(size=(10,1))
     mat = scipy.io.loadmat('quad_10_10_Q.mat')
     Q = mat['Q']
@@ -67,15 +68,13 @@ def quad_10_10_Hess(x):
  
 
 def quad_10_1000_func(x):
-    # set raondom seed
+    """Return the objective value for the 10-dimensional quadratic with kappa = 1000."""
     np.random.seed(0)
-    # Generate random data
     q = np.random.normal(size=(10,1))
 
     mat = scipy.io.loadmat('quad_10_1000_Q.mat')
     Q = mat['Q']
     
-    # compute function value
     return (1/2*x.T@Q@x + q.T@x)[0]
 
 
@@ -89,15 +88,13 @@ def quad_10_1000_func(x):
 # function that computes the function value of the quad_1000_10 function
 
 def quad_1000_10_func(x):
-    # set raondom seed
+    """Return the objective value for the 1000-dimensional quadratic with kappa = 10."""
     np.random.seed(0)
-    # Generate random data
     q = np.random.normal(size=(1000,1))
 
     mat = scipy.io.loadmat('quad_1000_10_Q.mat')
     Q = mat['Q']
     
-    # compute function value
     return (1/2*x.T@Q@x + q.T@x)[0]
 
 # Problem Number: 4
@@ -110,15 +107,13 @@ def quad_1000_10_func(x):
 # function that computes the function value of the quad_10_10 function
 
 def quad_1000_1000_func(x):
-    # set raondom seed
+    """Return the objective value for the 1000-dimensional quadratic with kappa = 1000."""
     np.random.seed(0)
-    # Generate random data
     q = np.random.normal(size=(1000,1))
     
     mat = scipy.io.loadmat('quad_1000_1000_Q.mat')
     Q = mat['Q']
     
-    # compute function value
     return (1/2*x.T@Q@x + q.T@x)[0]
 
 
@@ -132,6 +127,7 @@ def quad_1000_1000_func(x):
 
 
 def quartic_1_func(x):
+    """Return the quartic objective with the smaller sigma value."""
     Q = np.array([[5,1,0,0.5],
      [1,4,0.5,0],
      [0,0.5,3,0],
@@ -148,6 +144,7 @@ def quartic_1_func(x):
 
 
 def quartic_2_func(x):
+    """Return the quartic objective with the larger sigma value."""
     Q = np.array([[5,1,0,0.5],
      [1,4,0.5,0],
      [0,0.5,3,0],
@@ -169,6 +166,7 @@ def quartic_2_func(x):
 
 
 def genhumps_5_func(x):
+    """Return the objective value for the five-dimensional Genhumps problem."""
     f = 0
     for i in range(4):
         f = f + np.sin(2*x[i])**2*np.sin(2*x[i+1])**2 + 0.05*(x[i]**2 + x[i+1]**2)
@@ -177,6 +175,7 @@ def genhumps_5_func(x):
 # function that computes the gradient of the genhumps_5 function
 
 def genhumps_5_grad(x):
+    """Return the gradient of the five-dimensional Genhumps problem."""
     g = [4*np.sin(2*x[0])*np.cos(2*x[0])* np.sin(2*x[1])**2                  + 0.1*x[0],
          4*np.sin(2*x[1])*np.cos(2*x[1])*(np.sin(2*x[0])**2 + np.sin(2*x[2])**2) + 0.2*x[1],
          4*np.sin(2*x[2])*np.cos(2*x[2])*(np.sin(2*x[1])**2 + np.sin(2*x[3])**2) + 0.2*x[2],
@@ -186,7 +185,8 @@ def genhumps_5_grad(x):
     return np.array(g)
 
 # function that computes the Hessian of the genhumps_5 function
-def genhumps_5_Hess(x)
+def genhumps_5_Hess(x):
+    """Return the Hessian of the five-dimensional Genhumps problem."""
     H = np.zeros((5,5))
     H[0,0] =  8* np.sin(2*x[1])**2*(np.cos(2*x[0])**2 - np.sin(2*x[0])**2) + 0.1
     H[0,1] = 16* np.sin(2*x[0])*np.cos(2*x[0])*np.sin(2*x[1])*np.cos(2*x[1])

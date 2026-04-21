@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+# test_parameters.sh
+# Run the parameter sweeps used in this project for both:
+#   1. line-search settings (c1_ls, c2_ls), and
+#   2. trust-region / CG settings (c1_tr, c2_tr, term_tol_CG, max_iterations_CG).
+# The script saves per-configuration result folders and writes summary CSV files
+# so different parameter choices can be compared after the sweep finishes.
+
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

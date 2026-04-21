@@ -27,20 +27,24 @@ class Problem:
         self.H_evals = 0
 
     def compute_f(self, x):
+        """Evaluate the objective and increment the corresponding counter."""
         self.f_evals += 1
         return float(self._f(x))
 
     def compute_g(self, x):
+        """Evaluate the gradient and increment the corresponding counter."""
         self.g_evals += 1
         return np.array(self._g(x), dtype=float)
 
     def compute_H(self, x):
+        """Evaluate the Hessian and increment the corresponding counter."""
         if self._H is None:
             raise NotImplementedError(f"Hessian not provided for {self.name}")
         self.H_evals += 1
         return np.array(self._H(x), dtype=float)
 
     def reset_counters(self):
+        """Reset evaluation counters before a fresh solver run."""
         self.f_evals = 0
         self.g_evals = 0
         self.H_evals = 0
@@ -93,6 +97,7 @@ def p4_quad_1000_1000():
 
 # ===== P5-P6: Quartic =====
 # f(x) = 0.5 x^T x + (sigma/4)(x^T Q x)^2
+# Shared quartic data reused by both sigma choices.
 _Q_QUARTIC = np.array([[5, 1, 0, 0.5],
                         [1, 4, 0.5, 0],
                         [0, 0.5, 3, 0],
@@ -131,6 +136,9 @@ def p6_quartic_2():
 
 
 # ===== P7 / P13-P14: Rosenbrock 2D =====
+# P13 and P14 are custom Rosenbrock variants designed by our team.
+# They are not part of the original project test set; we use them to study
+# how sensitive the algorithms are to the curvature condition in line search.
 
 def _make_rosenbrock_2d(beta):
     """Build a 2D Rosenbrock variant with coefficient beta."""
@@ -158,13 +166,13 @@ def p7_rosenbrock_2():
 
 
 def p13_rosenbrock_2_100():
-    """Rosenbrock variant, n=2, beta=100."""
+    """Custom Rosenbrock variant designed by our team for curvature-condition tests."""
     f, g, H = _make_rosenbrock_2d(100)
     return Problem('P13_rosenbrock_2_100', np.array([0.0, 1.0]), f, g, H)
 
 
 def p14_rosenbrock_2_1000():
-    """Rosenbrock variant, n=2, beta=1000."""
+    """Custom Rosenbrock variant designed by our team for curvature-condition tests."""
     f, g, H = _make_rosenbrock_2d(1000)
     return Problem('P14_rosenbrock_2_1000', np.array([0.0, 1.0]), f, g, H)
 
@@ -319,6 +327,7 @@ def p12_genhumps_5():
 
 
 # ===== Dispatcher =====
+# This map is the canonical source for problem names used throughout the project.
 
 _PROBLEM_MAP = {
     'P1_quad_10_10':    p1_quad_10_10,
